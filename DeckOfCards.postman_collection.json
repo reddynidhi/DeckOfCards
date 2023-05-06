@@ -1,0 +1,661 @@
+{
+	"info": {
+		"_postman_id": "95456463-4b7b-428c-beca-02e91fe5ef59",
+		"name": "DeckOfCards",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Shuffle the Cards",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"var jsonData = pm.response.json();\r",
+							"var deckid = jsonData.deck_id;\r",
+							"pm.collectionVariables.set(\"deck_id\", deckid);\r",
+							"pm.test(\"Response is a success\", function () {\r",
+							"    var succ = jsonData.success;\r",
+							"    pm.expect(succ).to.eql(true);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"validate deck count with the remaining value in response\", function(){\r",
+							"    var remaining = jsonData.remaining;\r",
+							"    var remact =JSON.stringify(remaining/52);\r",
+							"    console.log(\"remact: \"+remact);\r",
+							"    var deck_count = pm.collectionVariables.get(\"deck_count\");\r",
+							"    pm.expect(remact).to.eql(deck_count);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}new/shuffle/?deck_count={{deck_count}}",
+					"host": [
+						"{{url}}new"
+					],
+					"path": [
+						"shuffle",
+						""
+					],
+					"query": [
+						{
+							"key": "deck_count",
+							"value": "{{deck_count}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Draw Cards",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"var jsonData = pm.response.json();\r",
+							"var count = pm.collectionVariables.get(\"count\");\r",
+							"\r",
+							"pm.test(\"Response is a success\", function () {\r",
+							"    var succ = jsonData.success;\r",
+							"    pm.expect(succ).to.eql(true);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Verify Number of cards generated is equal to count passed\", function(){\r",
+							"var cards = JSON.stringify(jsonData.cards.length);\r",
+							"pm.expect(cards).to.eql(count);\r",
+							"});\r",
+							"\r",
+							"var rem = jsonData.remaining;\r",
+							"if(rem == 0){\r",
+							"        postman.setNextRequest(\"Draw Cards from New Deck\");\r",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}{{deck_id}}/draw/?count={{count}}",
+					"host": [
+						"{{url}}{{deck_id}}"
+					],
+					"path": [
+						"draw",
+						""
+					],
+					"query": [
+						{
+							"key": "count",
+							"value": "{{count}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Draw Cards from New Deck",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"var jsonData = pm.response.json();\r",
+							"var count = pm.collectionVariables.get(\"count\");\r",
+							"var deckid = pm.collectionVariables.get(\"deck_id\");\r",
+							"\r",
+							"pm.test(\"Response is a success\", function () {\r",
+							"    var succ = jsonData.success;\r",
+							"    pm.expect(succ).to.eql(true);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Verify Number of cards generated is equal to count passed\", function(){\r",
+							"var cards = JSON.stringify(jsonData.cards.length);\r",
+							"pm.expect(cards).to.eql(count);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Verify the deck_id is a new\", function(){\r",
+							"    var newdeckid = JSON.stringify(jsonData.deck_id);\r",
+							"    pm.expect(newdeckid).to.not.eql(deckid);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}new/draw/?count={{count}}",
+					"host": [
+						"{{url}}new"
+					],
+					"path": [
+						"draw",
+						""
+					],
+					"query": [
+						{
+							"key": "count",
+							"value": "{{count}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Reshuffle the Cards",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"var jsonData = pm.response.json();\r",
+							"var deckid = pm.collectionVariables.get(\"deck_id\");\r",
+							"pm.test(\"Response is a success\", function () {\r",
+							"    var succ = jsonData.success;\r",
+							"    pm.expect(succ).to.eql(true);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Verify the deck_id is same\", function(){\r",
+							"    var newdeckid = jsonData.deck_id;\r",
+							"    pm.expect(newdeckid).to.eql(deckid);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Verify Shuffled is true\", function(){\r",
+							"    var shuff = jsonData.shuffled;\r",
+							"    pm.expect(shuff).to.eql(true);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}{{deck_id}}/shuffle",
+					"host": [
+						"{{url}}{{deck_id}}"
+					],
+					"path": [
+						"shuffle"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Reshuffle Remaining Cards",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"var jsonData = pm.response.json();\r",
+							"var deckid = pm.collectionVariables.get(\"deck_id\");\r",
+							"pm.test(\"Response is a success\", function () {\r",
+							"    var succ = jsonData.success;\r",
+							"    pm.expect(succ).to.eql(true);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Verify the deck_id is same\", function(){\r",
+							"    var newdeckid = jsonData.deck_id;\r",
+							"    pm.expect(newdeckid).to.eql(deckid);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Verify Shuffled is true\", function(){\r",
+							"    var shuff = jsonData.shuffled;\r",
+							"    pm.expect(shuff).to.eql(true);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}{{deck_id}}/shuffle?remaining=true",
+					"host": [
+						"{{url}}{{deck_id}}"
+					],
+					"path": [
+						"shuffle"
+					],
+					"query": [
+						{
+							"key": "remaining",
+							"value": "true"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "A Brand New Deck",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"var jsonData = pm.response.json();\r",
+							"pm.test(\"Response is a success\", function () {\r",
+							"    var succ = jsonData.success;\r",
+							"    pm.expect(succ).to.eql(true);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"validate remaining cards count is including jokers\", function(){\r",
+							"    var remaining = jsonData.remaining;\r",
+							"    pm.expect(remaining).to.eql(54);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}new/?jokers_enabled=true",
+					"host": [
+						"{{url}}new"
+					],
+					"path": [
+						""
+					],
+					"query": [
+						{
+							"key": "jokers_enabled",
+							"value": "true"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "A Partial Deck",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"var jsonData = pm.response.json();\r",
+							"pm.test(\"Response is a success\", function () {\r",
+							"    var succ = jsonData.success;\r",
+							"    pm.expect(succ).to.eql(true);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}new/shuffle/?cards={{card_value}}",
+					"host": [
+						"{{url}}new"
+					],
+					"path": [
+						"shuffle",
+						""
+					],
+					"query": [
+						{
+							"key": "cards",
+							"value": "{{card_value}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Adding to Piles",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"var jsonData = pm.response.json();\r",
+							"pm.test(\"Response is a success\", function () {\r",
+							"    var succ = jsonData.success;\r",
+							"    pm.expect(succ).to.eql(true);\r",
+							"});\r",
+							"\r",
+							"// pm.test(\"Verify Pile Name\", function(){\r",
+							"//     var pile = jsonData.piles;\r",
+							"//     console.log(\"pile: \"+pile);\r",
+							"//     pm.expect(pile).to.have(\"discard\");\r",
+							"// });"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}{{deck_id}}/pile/{{pile_name}}/add/?cards=2D",
+					"host": [
+						"{{url}}{{deck_id}}"
+					],
+					"path": [
+						"pile",
+						"{{pile_name}}",
+						"add",
+						""
+					],
+					"query": [
+						{
+							"key": "cards",
+							"value": "2D"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Shuffle Piles",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"var jsonData = pm.response.json();\r",
+							"pm.test(\"Response is a success\", function () {\r",
+							"    var succ = jsonData.success;\r",
+							"    pm.expect(succ).to.eql(true);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}{{deck_id}}/pile/{{pile_name}}/shuffle/",
+					"host": [
+						"{{url}}{{deck_id}}"
+					],
+					"path": [
+						"pile",
+						"{{pile_name}}",
+						"shuffle",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Listing Cards in a Pile",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"var jsonData = pm.response.json();\r",
+							"pm.test(\"Response is a success\", function () {\r",
+							"    var succ = jsonData.success;\r",
+							"    pm.expect(succ).to.eql(true);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}{{deck_id}}/pile/{{pile_name}}/list/",
+					"host": [
+						"{{url}}{{deck_id}}"
+					],
+					"path": [
+						"pile",
+						"{{pile_name}}",
+						"list",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Drawing from Piles",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"var jsonData = pm.response.json();\r",
+							"pm.test(\"Response is a success\", function () {\r",
+							"    var succ = jsonData.success;\r",
+							"    pm.expect(succ).to.eql(true);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}{{deck_id}}/pile/{{pile_name}}/draw/?cards=2D",
+					"host": [
+						"{{url}}{{deck_id}}"
+					],
+					"path": [
+						"pile",
+						"{{pile_name}}",
+						"draw",
+						""
+					],
+					"query": [
+						{
+							"key": "cards",
+							"value": "2D"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Drawing from Pile Bottom",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}{{deck_id}}/draw/bottom",
+					"host": [
+						"{{url}}{{deck_id}}"
+					],
+					"path": [
+						"draw",
+						"bottom"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Returning Cards to the Deck",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"var jsonData = pm.response.json();\r",
+							"pm.test(\"Response is a success\", function () {\r",
+							"    var succ = jsonData.success;\r",
+							"    pm.expect(succ).to.eql(true);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}{{deck_id}}/return",
+					"host": [
+						"{{url}}{{deck_id}}"
+					],
+					"path": [
+						"return"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "deck_id",
+			"value": ""
+		},
+		{
+			"key": "deck_count",
+			"value": "1"
+		},
+		{
+			"key": "deck_count",
+			"value": ""
+		},
+		{
+			"key": "count",
+			"value": "4"
+		},
+		{
+			"key": "count",
+			"value": ""
+		},
+		{
+			"key": "card_value",
+			"value": "AS,2S,KS"
+		},
+		{
+			"key": "pile_name",
+			"value": "discard"
+		}
+	]
+}
