@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "95456463-4b7b-428c-beca-02e91fe5ef59",
+		"_postman_id": "85e887c6-1952-4289-9b66-f62be8831766",
 		"name": "DeckOfCards",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -638,16 +638,8 @@
 			"value": "1"
 		},
 		{
-			"key": "deck_count",
-			"value": ""
-		},
-		{
 			"key": "count",
 			"value": "4"
-		},
-		{
-			"key": "count",
-			"value": ""
 		},
 		{
 			"key": "card_value",
@@ -656,6 +648,11 @@
 		{
 			"key": "pile_name",
 			"value": "discard"
+		},
+		{
+			"key": "url",
+			"value": "https://deckofcardsapi.com/api/deck/",
+			"type": "default"
 		}
 	]
 }
